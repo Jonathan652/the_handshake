@@ -50,11 +50,11 @@ interface Lawyer {
   verified: boolean;
 }
 
-// --- AI Service ---
+// --- Oracle Core ---
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 const SYSTEM_INSTRUCTION = `
-You are the "Luganda Land Oracle", a specialized AI legal assistant for the Uganda Land Act (Chapter 236).
+You are the "Luganda Land Oracle", a specialized digital legal advisor for the Uganda Land Act (Chapter 236).
 Your goal is to provide accurate, helpful, and accessible legal guidance regarding land ownership, tenure systems, and rights in Uganda.
 
 CORE KNOWLEDGE:
@@ -80,7 +80,7 @@ MONETIZATION AWARENESS:
 TONE AND STYLE:
 - Be authoritative yet empathetic.
 - Use clear headings and bullet points for readability.
-- Always include a disclaimer that you are an AI assistant and your guidance does not constitute formal legal advice from a lawyer.
+- Always include a disclaimer that you are a digital assistant and your guidance does not constitute formal legal advice from a lawyer.
 
 CONTEXT:
 ${UGANDA_LAND_ACT_CONTEXT}
@@ -183,7 +183,7 @@ export default function App() {
         speakText(assistantMessage.content, assistantMessage.id);
         if (!isPro) setFreeQuestionsRemaining(prev => Math.max(0, prev - 1));
       } catch (error) {
-        console.error("AI Audio Error:", error);
+        console.error("Voice Processing Error:", error);
         setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: "Nfuna obuzibu mu kuwuliriza eddoboozi lyo.", timestamp: new Date() }]);
       } finally {
         setIsLoading(false);
@@ -224,6 +224,12 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    if (!process.env.GEMINI_API_KEY) {
+      console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
+    }
+  }, []);
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
     if (!isPro && freeQuestionsRemaining <= 0) return;
@@ -234,7 +240,7 @@ export default function App() {
     setIsLoading(true);
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-3-flash-preview",
         contents: [{ role: 'user', parts: [{ text: input }] }],
         config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.7 },
       });
@@ -242,9 +248,15 @@ export default function App() {
       setMessages(prev => [...prev, assistantMessage]);
       speakText(assistantMessage.content, assistantMessage.id);
       if (!isPro) setFreeQuestionsRemaining(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("AI Error:", error);
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: "Nfuna obuzibu mu kukuddamu.", timestamp: new Date() }]);
+    } catch (error: any) {
+      console.error("Oracle Error Details:", error);
+      let errorMessage = "Nfuna obuzibu mu kukuddamu.";
+      if (error?.message?.includes("API_KEY_INVALID")) {
+        errorMessage = "Oracle settings tezikola. Genda mu Settings okyusemu.";
+      } else if (error?.message?.includes("quota")) {
+        errorMessage = "Okozesezza nnyo Oracle leero. Gezaako enkya.";
+      }
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', content: errorMessage, timestamp: new Date() }]);
     } finally { setIsLoading(false); }
   };
 
