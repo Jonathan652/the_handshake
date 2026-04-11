@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "764541534831",
+    "project_id": "handshake-9eba6",
+    "storage_bucket": "handshake-9eba6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:764541534831:android:658211ec82a4d25f3c039a",
+        "android_client_info": {
+          "package_name": "com.example.the_handshake"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo5le8zlHgJmOBj3qTVu_gLyYDF8aM-VY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
