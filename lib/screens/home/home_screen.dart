@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/auth_service.dart';
+import '../transactions/new_transaction_screen.dart';
+import '../transactions/transaction_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final uid  = FirebaseAuth.instance.currentUser!.uid;
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     final auth = AuthService();
 
     return Scaffold(
@@ -27,10 +29,8 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .snapshots(),
+        stream:
+            FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
         builder: (context, snap) {
           if (!snap.hasData) {
             return const Center(
@@ -38,8 +38,8 @@ class HomeScreen extends StatelessWidget {
             );
           }
 
-          final data    = snap.data!.data() as Map<String, dynamic>? ?? {};
-          final name    = data['displayName'] ?? 'User';
+          final data = snap.data!.data() as Map<String, dynamic>? ?? {};
+          final name = data['displayName'] ?? 'User';
           final balance = data['walletBalance'] ?? 0;
 
           return SingleChildScrollView(
@@ -47,7 +47,6 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // Welcome + balance card
                 Container(
                   width: double.infinity,
@@ -113,11 +112,12 @@ class HomeScreen extends StatelessWidget {
                         icon: Icons.add_circle_outline,
                         label: 'New transaction',
                         color: const Color(0xFF0F6E56),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Coming soon!')),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NewTransactionScreen(),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -126,11 +126,12 @@ class HomeScreen extends StatelessWidget {
                         icon: Icons.history,
                         label: 'My transactions',
                         color: const Color(0xFF534AB7),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Coming soon!')),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const TransactionListScreen(),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -175,9 +176,9 @@ class HomeScreen extends StatelessWidget {
 
   String _formatAmount(int amount) {
     return amount.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (m) => '${m[1]},',
+        );
   }
 }
 
