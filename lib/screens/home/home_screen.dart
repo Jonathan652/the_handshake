@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../services/auth_service.dart';
 import '../transactions/new_transaction_screen.dart';
 import '../transactions/transaction_list_screen.dart';
 
@@ -11,7 +10,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final auth = AuthService();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1EFE8),
@@ -21,12 +19,6 @@ class HomeScreen extends StatelessWidget {
           'The Handshake',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () => auth.signOut(),
-          ),
-        ],
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream:

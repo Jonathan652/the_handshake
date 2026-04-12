@@ -15,7 +15,6 @@ dependencies:
   firebase_auth: ^5.1.0
   cloud_firestore: ^5.1.0
   cloud_functions: ^5.0.0
-  async: ^2.11.0
 
   # UI
   cupertino_icons: ^1.0.8

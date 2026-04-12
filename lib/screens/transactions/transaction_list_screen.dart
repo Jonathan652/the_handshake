@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:async/async.dart';
 import 'transaction_detail_screen.dart';
 
 class TransactionListScreen extends StatelessWidget {
@@ -17,56 +16,130 @@ class TransactionListScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF534AB7),
         title: const Text(
           'My transactions',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: StreamBuilder<List<QuerySnapshot>>(
-  stream: StreamZip([
-    FirebaseFirestore.instance
-      .collection('transactions')
-      .where('buyerId', isEqualTo: uid)
-      .orderBy('createdAt', descending: true)
-      .snapshots(),
-    FirebaseFirestore.instance
-      .collection('transactions')
-      .where('sellerId', isEqualTo: uid)
-      .orderBy('createdAt', descending: true)
-      .snapshots(),
-  ]),
-  builder: (context, snap) {
-    if (snap.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF534AB7)),
-      );
-    }
+      body: _TransactionList(uid: uid),
+    );
+  }
+}
 
-    if (!snap.hasData) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF534AB7)),
-      );
-    }
+class _TransactionList extends StatefulWidget {
+  final String uid;
+  const _TransactionList({required this.uid});
 
-    // Merge both query results and remove duplicates
-    final allDocs = <String, QueryDocumentSnapshot>{};
-    for (final snapshot in snap.data!) {
-      for (final doc in snapshot.docs) {
+  @override
+  State<_TransactionList> createState() => _TransactionListState();
+}
+
+class _TransactionListState extends State<_TransactionList> {
+  List<QueryDocumentSnapshot> _docs = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  Future<void> _loadTransactions() async {
+    try {
+      // Fetch as buyer
+      final buyerSnap = await FirebaseFirestore.instance
+          .collection('transactions')
+          .where('buyerId', isEqualTo: widget.uid)
+          .get();
+
+      // Fetch as seller
+      final sellerSnap = await FirebaseFirestore.instance
+          .collection('transactions')
+          .where('sellerId', isEqualTo: widget.uid)
+          .get();
+
+      // Merge and deduplicate
+      final allDocs = <String, QueryDocumentSnapshot>{};
+      for (final doc in buyerSnap.docs) {
         allDocs[doc.id] = doc;
       }
+      for (final doc in sellerSnap.docs) {
+        allDocs[doc.id] = doc;
+      }
+
+      // Sort by createdAt descending
+      final sorted = allDocs.values.toList()
+        ..sort((a, b) {
+          final aData = a.data() as Map<String, dynamic>;
+          final bData = b.data() as Map<String, dynamic>;
+          final aTime = aData['createdAt'] as Timestamp?;
+          final bTime = bData['createdAt'] as Timestamp?;
+          if (aTime == null && bTime == null) return 0;
+          if (aTime == null) return 1;
+          if (bTime == null) return -1;
+          return bTime.compareTo(aTime);
+        });
+
+      if (mounted) {
+        setState(() {
+          _docs    = sorted;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error   = e.toString();
+          _loading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF534AB7)),
+      );
     }
 
-    final docs = allDocs.values.toList()
-      ..sort((a, b) {
-        final aTime = (a.data() as Map)['createdAt'];
-        final bTime = (b.data() as Map)['createdAt'];
-        if (aTime == null || bTime == null) return 0;
-        return (bTime as Timestamp).compareTo(aTime as Timestamp);
-      });
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline,
+                  color: Color(0xFFA32D2D), size: 48),
+              const SizedBox(height: 16),
+              Text(_error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFFA32D2D))),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() { _loading = true; _error = null; });
+                  _loadTransactions();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF534AB7),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
-    if (docs.isEmpty) {
+    if (_docs.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -84,32 +157,41 @@ class TransactionListScreen extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Create a new transaction to get started',
-              style: TextStyle(color: Color(0xFF888780), fontSize: 13),
+              style: TextStyle(
+                  color: Color(0xFF888780), fontSize: 13),
             ),
           ],
         ),
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: docs.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (context, i) {
-        final data  = docs[i].data() as Map<String, dynamic>;
-        final txnId = docs[i].id;
-        final isBuyer = data['buyerId'] == uid;
+    return RefreshIndicator(
+      color: const Color(0xFF534AB7),
+      onRefresh: _loadTransactions,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: _docs.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        itemBuilder: (context, i) {
+          final data    = _docs[i].data() as Map<String, dynamic>;
+          final txnId   = _docs[i].id;
+          final isBuyer = data['buyerId'] == widget.uid;
 
-        return _TransactionCard(
-          txnId:   txnId,
-          data:    data,
-          isBuyer: isBuyer,
-          onTap:   () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => TransactionDetailScreen(txnId: txnId),            ),
+          return _TransactionCard(
+            txnId:   txnId,
+            data:    data,
+            isBuyer: isBuyer,
+            onTap:   () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      TransactionDetailScreen(txnId: txnId),
                 ),
               );
+              // Refresh list when returning from detail screen
+              setState(() => _loading = true);
+              _loadTransactions();
             },
           );
         },
@@ -146,11 +228,11 @@ class _TransactionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFD3D1C7), width: 0.5),
+          border: Border.all(
+              color: const Color(0xFFD3D1C7), width: 0.5),
         ),
         child: Row(
           children: [
-            // State indicator dot
             Container(
               width: 10, height: 10,
               decoration: BoxDecoration(
@@ -159,8 +241,6 @@ class _TransactionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
-            // Main content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,10 +260,10 @@ class _TransactionCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2,
-                        ),
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: (stateConfig['color'] as Color).withOpacity(0.1),
+                          color: (stateConfig['color'] as Color)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -199,7 +279,8 @@ class _TransactionCard extends StatelessWidget {
                       Text(
                         isBuyer ? 'You are buyer' : 'You are seller',
                         style: const TextStyle(
-                          fontSize: 11, color: Color(0xFF888780),
+                          fontSize: 11,
+                          color: Color(0xFF888780),
                         ),
                       ),
                     ],
@@ -207,8 +288,6 @@ class _TransactionCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Amount
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -222,7 +301,7 @@ class _TransactionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Icon(Icons.chevron_right,
-                  color: Color(0xFF888780), size: 18),
+                    color: Color(0xFF888780), size: 18),
               ],
             ),
           ],
@@ -241,8 +320,6 @@ class _TransactionCard extends StatelessWidget {
         return {'color': const Color(0xFF534AB7), 'label': 'Pending delivery'};
       case 'IN_TRANSIT':
         return {'color': const Color(0xFF185FA5), 'label': 'In transit'};
-      case 'INSPECTION_WINDOW':
-        return {'color': const Color(0xFF185FA5), 'label': 'Inspection window'};
       case 'COMPLETED':
         return {'color': const Color(0xFF0F6E56), 'label': 'Completed'};
       case 'DISPUTED':
@@ -255,5 +332,5 @@ class _TransactionCard extends StatelessWidget {
   }
 
   String _format(int n) => n.toString().replaceAllMapped(
-    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
 }
