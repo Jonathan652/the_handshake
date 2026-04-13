@@ -189,13 +189,18 @@ class _TransactionDetailScreenState
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1EFE8),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF534AB7),
+        backgroundColor: const Color(0xFF064E3B),
+        elevation: 0,
         title: const Text(
           'Transaction detail',
           style: TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 21,
+            letterSpacing: -0.5,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -211,7 +216,7 @@ class _TransactionDetailScreenState
           if (!snap.hasData) {
             return const Center(
               child: CircularProgressIndicator(
-                  color: Color(0xFF534AB7)),
+                  color: Color(0xFF064E3B)),
             );
           }
 
@@ -222,7 +227,7 @@ class _TransactionDetailScreenState
           final vault    = data['vaultAmount'] ?? 0;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 26),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -264,17 +269,17 @@ class _TransactionDetailScreenState
                 // Vault card
                 if (vault > 0)
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEEDFE),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: const Color(0xFF534AB7), width: 0.5),
+                        color: const Color(0xFF10B981), width: 1),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.lock,
-                          color: Color(0xFF534AB7), size: 20),
+                          color: Color(0xFF064E3B), size: 20),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,15 +287,17 @@ class _TransactionDetailScreenState
                             const Text('In escrow',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF534AB7),
+                                color: Color(0xFF047857),
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             Text(
                               'UGX ${_format(vault)}',
                               style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF534AB7),
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF064E3B),
+                                letterSpacing: -0.4,
                               ),
                             ),
                           ],
@@ -304,7 +311,7 @@ class _TransactionDetailScreenState
                 if (_loading)
                   const Center(
                     child: CircularProgressIndicator(
-                        color: Color(0xFF534AB7)),
+                        color: Color(0xFF064E3B)),
                   )
                 else ...[
 
@@ -313,7 +320,7 @@ class _TransactionDetailScreenState
                     _actionButton(
                       label: 'Accept order',
                       icon:  Icons.check_circle_outline,
-                      color: const Color(0xFF0F6E56),
+                      color: const Color(0xFF064E3B),
                       onTap: () => _sellerAccept(uid),
                     ),
                     const SizedBox(height: 10),
@@ -331,7 +338,7 @@ class _TransactionDetailScreenState
                     _actionButton(
                       label: 'Confirm receipt',
                       icon:  Icons.verified_outlined,
-                      color: const Color(0xFF0F6E56),
+                      color: const Color(0xFF064E3B),
                       onTap: () => _buyerConfirm(uid, vault),
                     ),
                     const SizedBox(height: 10),
@@ -349,7 +356,7 @@ class _TransactionDetailScreenState
                     _statusChip(
                       'Transaction completed',
                       Icons.check_circle,
-                      const Color(0xFF0F6E56),
+                      const Color(0xFF10B981),
                     ),
                   if (state == 'REFUNDED')
                     _statusChip(
@@ -375,11 +382,18 @@ class _TransactionDetailScreenState
   // ── Helpers ─────────────────────────────────────────────
 
   Widget _card({required Widget child}) => Container(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: const Color(0xFFD3D1C7), width: 0.5),
+      borderRadius: BorderRadius.circular(24),
+      border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x0D0F172A),
+          blurRadius: 18,
+          offset: Offset(0, 8),
+        ),
+      ],
     ),
     child: child,
   );
@@ -393,11 +407,14 @@ class _TransactionDetailScreenState
         children: [
           Text(label,
             style: const TextStyle(
-              fontSize: 13, color: Color(0xFF888780))),
+              fontSize: 13,
+              color: Color(0xFF475569),
+              fontWeight: FontWeight.w600,
+            )),
           Text(value,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              fontWeight: bold ? FontWeight.w900 : FontWeight.w700,
               color: color,
             )),
         ],
@@ -413,18 +430,22 @@ class _TransactionDetailScreenState
     bool outline = false,
   }) {
     return SizedBox(
-      height: 50,
+      height: 54,
       child: outline
         ? OutlinedButton.icon(
             onPressed: onTap,
             icon: Icon(icon, color: color),
             label: Text(label,
               style: TextStyle(
-                color: color, fontWeight: FontWeight.bold)),
+                color: color,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.2,
+              )),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: color),
+              side: BorderSide(color: color, width: 1.3),
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(18)),
             ),
           )
         : ElevatedButton.icon(
@@ -432,11 +453,15 @@ class _TransactionDetailScreenState
             icon: Icon(icon, color: Colors.white),
             label: Text(label,
               style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.2,
+              )),
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(18)),
             ),
           ),
     );
@@ -447,7 +472,7 @@ class _TransactionDetailScreenState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
@@ -458,7 +483,7 @@ class _TransactionDetailScreenState
           Text(label,
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
               fontSize: 14,
             )),
         ],
@@ -476,11 +501,20 @@ class _TransactionDetailScreenState
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.circular(24)),
         title: Text(title,
-          style: const TextStyle(fontWeight: FontWeight.bold)),
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.4,
+            color: Color(0xFF0F172A),
+          )),
         content: Text(message,
-          style: const TextStyle(fontSize: 14)),
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF334155),
+            height: 1.35,
+            fontWeight: FontWeight.w500,
+          )),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -490,11 +524,11 @@ class _TransactionDetailScreenState
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: danger
-                ? const Color(0xFFA32D2D)
-                : const Color(0xFF534AB7),
+                ? const Color(0xFFE11D48)
+                : const Color(0xFF064E3B),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(confirm),
           ),
@@ -517,12 +551,19 @@ class _StateBanner extends StatelessWidget {
     final config = _config();
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
       decoration: BoxDecoration(
-        color: (config['color'] as Color).withOpacity(0.12),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            (config['color'] as Color).withOpacity(0.18),
+            (config['color'] as Color).withOpacity(0.08),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: (config['color'] as Color).withOpacity(0.4)),
+          color: (config['color'] as Color).withOpacity(0.35)),
       ),
       child: Row(
         children: [
@@ -534,14 +575,16 @@ class _StateBanner extends StatelessWidget {
             children: [
               Text(config['label'] as String,
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w900,
                   color: config['color'] as Color,
-                  fontSize: 14,
+                  fontSize: 15,
+                  letterSpacing: -0.3,
                 )),
               Text(config['subtitle'] as String,
                 style: TextStyle(
                   fontSize: 12,
                   color: (config['color'] as Color).withOpacity(0.8),
+                  fontWeight: FontWeight.w600,
                 )),
             ],
           ),
@@ -554,49 +597,49 @@ class _StateBanner extends StatelessWidget {
     switch (state) {
       case 'CREATED':
         return {
-          'color':    const Color(0xFF888780),
+          'color':    const Color(0xFF64748B),
           'icon':     Icons.edit_outlined,
           'label':    'Created',
           'subtitle': 'Waiting for payment to be locked',
         };
       case 'LOCKED':
         return {
-          'color':    const Color(0xFF854F0B),
+          'color':    const Color(0xFF1E293B),
           'icon':     Icons.lock_outline,
           'label':    'Funds locked in escrow',
           'subtitle': 'Waiting for seller to accept',
         };
       case 'PENDING_DELIVERY':
         return {
-          'color':    const Color(0xFF534AB7),
+          'color':    const Color(0xFF0F766E),
           'icon':     Icons.local_shipping_outlined,
           'label':    'Pending delivery',
           'subtitle': 'Seller has accepted — awaiting delivery',
         };
       case 'COMPLETED':
         return {
-          'color':    const Color(0xFF0F6E56),
+          'color':    const Color(0xFF10B981),
           'icon':     Icons.check_circle_outline,
           'label':    'Completed',
           'subtitle': 'Funds released to seller',
         };
       case 'DISPUTED':
         return {
-          'color':    const Color(0xFFA32D2D),
+          'color':    const Color(0xFFE11D48),
           'icon':     Icons.gavel_outlined,
           'label':    'Disputed',
           'subtitle': 'Funds frozen — awaiting arbiter',
         };
       case 'REFUNDED':
         return {
-          'color':    const Color(0xFF0F6E56),
+          'color':    const Color(0xFF1E293B),
           'icon':     Icons.undo,
           'label':    'Refunded',
           'subtitle': 'Funds returned to buyer',
         };
       default:
         return {
-          'color':    const Color(0xFF888780),
+          'color':    const Color(0xFF64748B),
           'icon':     Icons.info_outline,
           'label':    state,
           'subtitle': '',

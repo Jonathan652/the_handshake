@@ -12,13 +12,18 @@ class ProfileScreen extends StatelessWidget {
     final auth = AuthService();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1EFE8),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF534AB7),
+        backgroundColor: const Color(0xFF064E3B),
+        elevation: 0,
         title: const Text(
           'Profile',
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 21,
+            letterSpacing: -0.5,
+          ),
         ),
         actions: [
           IconButton(
@@ -28,11 +33,21 @@ class ProfileScreen extends StatelessWidget {
                 context: context,
                 builder: (_) => AlertDialog(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(24)),
                   title: const Text('Sign out',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.4,
+                        color: Color(0xFF0F172A),
+                      )),
                   content:
-                      const Text('Are you sure you want to sign out?'),
+                      const Text(
+                        'Are you sure you want to sign out?',
+                        style: TextStyle(
+                          color: Color(0xFF334155),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -41,8 +56,11 @@ class ProfileScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF534AB7),
+                        backgroundColor: const Color(0xFF064E3B),
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text('Sign out'),
                     ),
@@ -63,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
           if (!snap.hasData) {
             return const Center(
               child: CircularProgressIndicator(
-                  color: Color(0xFF534AB7)),
+                  color: Color(0xFF064E3B)),
             );
           }
 
@@ -78,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
           final disputes= data['disputeCount'] ?? 0;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 26),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -88,10 +106,25 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Container(
-                        width: 80, height: 80,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF534AB7),
+                        width: 86,
+                        height: 86,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF064E3B),
+                              Color(0xFF1E293B),
+                            ],
+                          ),
                           shape: BoxShape.circle,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x26064E3B),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Text(
@@ -101,7 +134,8 @@ class ProfileScreen extends StatelessWidget {
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 32,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
                             ),
                           ),
                         ),
@@ -109,15 +143,17 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(name,
                         style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C2C2A),
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.5,
                         )),
                       const SizedBox(height: 4),
                       Text(email,
                         style: const TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF888780),
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w600,
                         )),
                     ],
                   ),
@@ -128,8 +164,22 @@ class ProfileScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF534AB7),
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF064E3B),
+                        Color(0xFF1E293B),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x22064E3B),
+                        blurRadius: 24,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,8 +187,9 @@ class ProfileScreen extends StatelessWidget {
                       Text(
                         'Virtual wallet',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withOpacity(0.78),
                           fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -146,8 +197,9 @@ class ProfileScreen extends StatelessWidget {
                         'UGX ${_format(balance)}',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.8,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -159,12 +211,15 @@ class ProfileScreen extends StatelessWidget {
                           icon: const Icon(Icons.add,
                               color: Colors.white, size: 18),
                           label: const Text('Top up balance',
-                            style: TextStyle(color: Colors.white)),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            )),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                                 color: Colors.white54),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
                         ),
@@ -223,15 +278,15 @@ class ProfileScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFAEEDA),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFFFF7ED),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: const Color(0xFF854F0B), width: 0.5),
+                      color: const Color(0xFFF59E0B), width: 1),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.info_outline,
-                        color: Color(0xFF854F0B), size: 18),
+                        color: Color(0xFFB45309), size: 18),
                       const SizedBox(width: 10),
                       const Expanded(
                         child: Text(
@@ -239,7 +294,8 @@ class ProfileScreen extends StatelessWidget {
                           'Real MTN MoMo integration coming in production.',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF633806),
+                            color: Color(0xFF9A3412),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -263,16 +319,23 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.circular(24)),
         title: const Text('Top up virtual wallet',
-          style: TextStyle(fontWeight: FontWeight.bold)),
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.4,
+            color: Color(0xFF0F172A),
+          )),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               'Select an amount to add to your demo wallet:',
               style: TextStyle(
-                  fontSize: 13, color: Color(0xFF888780)),
+                fontSize: 13,
+                color: Color(0xFF475569),
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 16),
             ...List.generate(amounts.length, (i) => Padding(
@@ -292,7 +355,7 @@ class ProfileScreen extends StatelessWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          backgroundColor: const Color(0xFF0F6E56),
+                          backgroundColor: const Color(0xFF064E3B),
                           content: Text(
                             '${labels[i]} added to your wallet'),
                         ),
@@ -301,14 +364,14 @@ class ProfileScreen extends StatelessWidget {
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(
-                        color: Color(0xFF534AB7)),
+                        color: Color(0xFF064E3B)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text(labels[i],
                     style: const TextStyle(
-                      color: Color(0xFF534AB7),
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF064E3B),
+                      fontWeight: FontWeight.w800,
                     )),
                 ),
               ),
@@ -341,22 +404,26 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: const Color(0xFFD3D1C7), width: 0.5),
+              color: const Color(0xFFE2E8F0), width: 1),
         ),
         child: Column(
           children: [
             Text(value,
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF534AB7),
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF064E3B),
+                letterSpacing: -0.4,
               )),
             const SizedBox(height: 4),
             Text(label,
               style: const TextStyle(
-                fontSize: 11, color: Color(0xFF888780)),
+                fontSize: 11,
+                color: Color(0xFF475569),
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -374,21 +441,29 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
         border:
-            Border.all(color: const Color(0xFFD3D1C7), width: 0.5),
+            Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D0F172A),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
             style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Color(0xFF2C2C2A),
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+              color: Color(0xFF0F172A),
+              letterSpacing: -0.4,
             )),
           const SizedBox(height: 14),
           ...rows.map((row) => Padding(
@@ -396,18 +471,21 @@ class _InfoCard extends StatelessWidget {
             child: Row(
               children: [
                 Icon(row.icon,
-                  color: const Color(0xFF534AB7), size: 18),
+                  color: const Color(0xFF0F766E), size: 18),
                 const SizedBox(width: 10),
                 Text(row.label,
                   style: const TextStyle(
-                    fontSize: 13, color: Color(0xFF888780))),
+                    fontSize: 13,
+                    color: Color(0xFF475569),
+                    fontWeight: FontWeight.w600,
+                  )),
                 const Spacer(),
                 Text(row.value,
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                     color: row.valueColor ??
-                        const Color(0xFF2C2C2A),
+                        const Color(0xFF0F172A),
                   )),
               ],
             ),

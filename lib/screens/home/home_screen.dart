@@ -12,12 +12,18 @@ class HomeScreen extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1EFE8),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF534AB7),
+        backgroundColor: const Color(0xFF064E3B),
+        elevation: 0,
         title: const Text(
           'The Handshake',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 22,
+            letterSpacing: -0.5,
+          ),
         ),
       ),
       body: StreamBuilder<DocumentSnapshot>(
@@ -26,7 +32,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, snap) {
           if (!snap.hasData) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF534AB7)),
+              child: CircularProgressIndicator(color: Color(0xFF064E3B)),
             );
           }
 
@@ -35,75 +41,121 @@ class HomeScreen extends StatelessWidget {
           final balance = data['walletBalance'] ?? 0;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 26),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Welcome + balance card
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(26),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF534AB7),
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF064E3B),
+                        Color(0xFF1E293B),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x26064E3B),
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Welcome back,',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.14),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.shield_rounded,
+                              color: Color(0xFF10B981),
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'SECURE VAULT',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              Text(
+                                'Welcome back, $name',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Text(
                         'Virtual wallet balance',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
+                          color: Colors.white.withOpacity(0.78),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         'UGX ${_formatAmount(balance)}',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.8,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
                 // Action buttons
                 const Text(
                   'Quick actions',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C2C2A),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
                       child: _ActionCard(
                         icon: Icons.add_circle_outline,
                         label: 'New transaction',
-                        color: const Color(0xFF0F6E56),
+                        color: const Color(0xFF064E3B),
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -117,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                       child: _ActionCard(
                         icon: Icons.history,
                         label: 'My transactions',
-                        color: const Color(0xFF534AB7),
+                        color: const Color(0xFF1E293B),
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -134,9 +186,10 @@ class HomeScreen extends StatelessWidget {
                 const Text(
                   'Your stats',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C2C2A),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -192,23 +245,39 @@ class _ActionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFD3D1C7), width: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F0F172A),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color, size: 26),
+            ),
+            const SizedBox(height: 12),
             Text(
               label,
-              textAlign: TextAlign.center,
               style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
+                color: const Color(0xFF0F172A),
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+                letterSpacing: -0.2,
               ),
             ),
           ],
@@ -228,28 +297,30 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFD3D1C7), width: 0.5),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Column(
           children: [
             Text(
               value,
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF534AB7),
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF064E3B),
+                letterSpacing: -0.4,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFF888780),
+                fontSize: 11.5,
+                color: Color(0xFF475569),
+                fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
             ),

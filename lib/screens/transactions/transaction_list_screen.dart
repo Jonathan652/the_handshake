@@ -11,13 +11,18 @@ class TransactionListScreen extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1EFE8),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF534AB7),
+        backgroundColor: const Color(0xFF064E3B),
+        elevation: 0,
         title: const Text(
           'My transactions',
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 21,
+            letterSpacing: -0.5,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -104,7 +109,7 @@ class _TransactionListState extends State<_TransactionList> {
   Widget build(BuildContext context) {
     if (_loading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF534AB7)),
+        child: CircularProgressIndicator(color: Color(0xFF064E3B)),
       );
     }
 
@@ -116,11 +121,14 @@ class _TransactionListState extends State<_TransactionList> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline,
-                  color: Color(0xFFA32D2D), size: 48),
+                  color: Color(0xFFE11D48), size: 48),
               const SizedBox(height: 16),
               Text(_error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFFA32D2D))),
+                style: const TextStyle(
+                  color: Color(0xFF9F1239),
+                  fontWeight: FontWeight.w600,
+                )),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
@@ -128,8 +136,11 @@ class _TransactionListState extends State<_TransactionList> {
                   _loadTransactions();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF534AB7),
+                  backgroundColor: const Color(0xFF064E3B),
                   foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: const Text('Retry'),
               ),
@@ -145,20 +156,25 @@ class _TransactionListState extends State<_TransactionList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.receipt_long_outlined,
-              size: 64, color: Colors.grey.shade400),
+              size: 64, color: const Color(0xFF94A3B8)),
             const SizedBox(height: 16),
             const Text(
               'No transactions yet',
               style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold,
-                color: Color(0xFF888780),
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+                color: Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
             const Text(
               'Create a new transaction to get started',
               style: TextStyle(
-                  color: Color(0xFF888780), fontSize: 13),
+                color: Color(0xFF64748B),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -166,12 +182,12 @@ class _TransactionListState extends State<_TransactionList> {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF534AB7),
+      color: const Color(0xFF064E3B),
       onRefresh: _loadTransactions,
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
         itemCount: _docs.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, i) {
           final data    = _docs[i].data() as Map<String, dynamic>;
           final txnId   = _docs[i].id;
@@ -224,17 +240,27 @@ class _TransactionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
-              color: const Color(0xFFD3D1C7), width: 0.5),
+            color: const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D0F172A),
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 10, height: 10,
+              width: 12,
+              height: 12,
               decoration: BoxDecoration(
                 color: stateConfig['color'] as Color,
                 shape: BoxShape.circle,
@@ -248,9 +274,10 @@ class _TransactionCard extends StatelessWidget {
                   Text(
                     description,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Color(0xFF2C2C2A),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      letterSpacing: -0.2,
+                      color: Color(0xFF0F172A),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -260,17 +287,19 @@ class _TransactionCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: (stateConfig['color'] as Color)
                               .withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                         child: Text(
                           stateConfig['label'] as String,
                           style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w800,
                             color: stateConfig['color'] as Color,
                           ),
                         ),
@@ -280,7 +309,8 @@ class _TransactionCard extends StatelessWidget {
                         isBuyer ? 'You are buyer' : 'You are seller',
                         style: const TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF888780),
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -294,14 +324,15 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   'UGX ${_format(totalUgx)}',
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Color(0xFF534AB7),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                    letterSpacing: -0.3,
+                    color: Color(0xFF064E3B),
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Icon(Icons.chevron_right,
-                    color: Color(0xFF888780), size: 18),
+                    color: Color(0xFF64748B), size: 18),
               ],
             ),
           ],
@@ -313,21 +344,21 @@ class _TransactionCard extends StatelessWidget {
   Map<String, dynamic> _stateConfig(String state) {
     switch (state) {
       case 'CREATED':
-        return {'color': const Color(0xFF888780), 'label': 'Created'};
+        return {'color': const Color(0xFF64748B), 'label': 'Created'};
       case 'LOCKED':
-        return {'color': const Color(0xFF854F0B), 'label': 'Locked'};
+        return {'color': const Color(0xFF1E293B), 'label': 'Locked'};
       case 'PENDING_DELIVERY':
-        return {'color': const Color(0xFF534AB7), 'label': 'Pending delivery'};
+        return {'color': const Color(0xFF0F766E), 'label': 'Pending delivery'};
       case 'IN_TRANSIT':
-        return {'color': const Color(0xFF185FA5), 'label': 'In transit'};
+        return {'color': const Color(0xFF334155), 'label': 'In transit'};
       case 'COMPLETED':
-        return {'color': const Color(0xFF0F6E56), 'label': 'Completed'};
+        return {'color': const Color(0xFF10B981), 'label': 'Completed'};
       case 'DISPUTED':
-        return {'color': const Color(0xFFA32D2D), 'label': 'Disputed'};
+        return {'color': const Color(0xFFE11D48), 'label': 'Disputed'};
       case 'REFUNDED':
-        return {'color': const Color(0xFF0F6E56), 'label': 'Refunded'};
+        return {'color': const Color(0xFF1E293B), 'label': 'Refunded'};
       default:
-        return {'color': const Color(0xFF888780), 'label': state};
+        return {'color': const Color(0xFF64748B), 'label': state};
     }
   }
 

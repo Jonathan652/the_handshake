@@ -27,18 +27,18 @@ class AuthService {
 
       // Create user document in Firestore
       await _db.collection('users').doc(credential.user!.uid).set({
-        'uid':               credential.user!.uid,
-        'email':             email,
-        'displayName':       displayName,
-        'phoneNumber':       phoneNumber,
-        'momoNumber':        momoNumber,
-        'role':              'user',
-        'isVerified':        false,
-        'walletBalance':     10000000, // UGX 10M demo balance
+        'uid': credential.user!.uid,
+        'email': email,
+        'displayName': displayName,
+        'phoneNumber': phoneNumber,
+        'momoNumber': momoNumber,
+        'role': 'user',
+        'isVerified': false,
+        'walletBalance': 10000000, // UGX 10M demo balance
         'totalTransactions': 0,
-        'disputeCount':      0,
-        'trustScore':        0,
-        'createdAt':         FieldValue.serverTimestamp(),
+        'disputeCount': 0,
+        'trustScore': 0,
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       return credential;
@@ -58,7 +58,42 @@ class AuthService {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthError(e);
+      throw await _handleLoginError(e, email: email);
+    }
+  }
+
+  Future<String> _handleLoginError(
+    FirebaseAuthException e, {
+    required String email,
+  }) async {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No account found with this email.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'user-disabled':
+        return 'This account has been disabled. Contact support.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'invalid-credential':
+        try {
+          final normalizedEmail = email.trim();
+          final userDoc = await _db
+              .collection('users')
+              .where('email', isEqualTo: normalizedEmail)
+              .limit(1)
+              .get();
+          if (userDoc.docs.isEmpty) {
+            return 'No account found with this email.';
+          }
+          return 'Incorrect password.';
+        } catch (_) {
+          return 'Invalid email or password.';
+        }
+      default:
+        return 'Something went wrong. Please try again.';
     }
   }
 
